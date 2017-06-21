@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = function(grunt) {
-	var yaml = require('js-yaml');
+	var linter = require('js-yaml');
 
 	grunt.registerMultiTask('yaml', 'Linting YAML', function() {
 		var done = this.async();
 		var options = this.options({
 			force: false,
-			schema: yaml.DEFAULT_SAFE_SCHEMA
+			schema: linter.DEFAULT_SAFE_SCHEMA
 		});
 		var failed = 0;
 		var passed = 0;
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 			var data = grunt.file.read(filepath);
 			options.filename = filepath;
 			try {
-				yaml.load(data, options);
+				linter.load(data, options);
 				grunt.verbose.ok(file + ' lint free.');
 				passed++;
 			} catch(e) {

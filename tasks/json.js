@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function(grunt) {
-	var jsonlint = require('jsonlint');
+	var linter = require('jsonlint');
 
 	grunt.registerMultiTask('json', 'Linting JSON', function() {
 		var done = this.async();
@@ -15,8 +15,8 @@ module.exports = function(grunt) {
 
 		// Hack into jsonlint's error handling
 		var errorDetails = null;
-		var originalParseError = jsonlint.parser.yy.parseError;
-		jsonlint.parser.yy.parseError = function(str, hash) {
+		var originalParseError = linter.parser.yy.parseError;
+		linter.parser.yy.parseError = function(str, hash) {
 			grunt.log.error(str);
 		};
 
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
 				grunt.log.debug('Validating "' + filepath + '"...');
 				var data = grunt.file.read(filepath);
 				try {
-					jsonlint.parse(data);
+					linter.parse(data);
 					grunt.verbose.ok(filepath + ' lint free.');
 					passed++;
 				} catch(e) {
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 				};
 			});
 		} finally {
-			jsonlint.parser.yy.parseError = originalParseError;
+			linter.parser.yy.parseError = originalParseError;
 		};
 
 		if(failed > 0) {
