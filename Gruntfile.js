@@ -7,7 +7,6 @@ module.exports = function(grunt) {
 		yaml: {
 			src: [
 				'**/*.yaml',
-				'!package.json',
 				'!node_modules/**'
 			]
 		},
@@ -21,11 +20,9 @@ module.exports = function(grunt) {
 				'!node_modules/**'
 			]
 		},
-		// TODO: cfg parser: https://github.com/MinecraftForge/MinecraftForge/blob/1.7.10/src/main/java/net/minecraftforge/common/config/Configuration.java#L791
 		cfg: {
 			src: [
 				'**/*.cfg',
-				'!package.json',
 				'!node_modules/**'
 			]
 		}

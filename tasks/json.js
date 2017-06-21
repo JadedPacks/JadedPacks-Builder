@@ -14,30 +14,23 @@ module.exports = function(grunt) {
 		delete options.force;
 
 		// Hack into jsonlint's error handling
-		var errorDetails = null;
-		var originalParseError = linter.parser.yy.parseError;
 		linter.parser.yy.parseError = function(str, hash) {
 			grunt.log.error(str);
 		};
 
-		try {
-			this.filesSrc.forEach(function(filepath) {
-				if(grunt.file.isDir(filepath)) {
-					return;
-				}
-				grunt.log.debug('Validating "' + filepath + '"...');
-				var data = grunt.file.read(filepath);
-				try {
-					linter.parse(data);
-					grunt.verbose.ok(filepath + ' lint free.');
-					passed++;
-				} catch(e) {
-					failed++;
-				};
-			});
-		} finally {
-			linter.parser.yy.parseError = originalParseError;
-		};
+		this.filesSrc.forEach(function(filepath) {
+			if(grunt.file.isDir(filepath)) {
+				return;
+			}
+			grunt.log.subhead('Validating "' + filepath + '"...');
+			try {
+				linter.parse(grunt.file.read(filepath));
+				grunt.verbose.ok(filepath + ' lint free.');
+				passed++;
+			} catch(e) {
+				failed++;
+			};
+		});
 
 		if(failed > 0) {
 			grunt.fail.warn(failed + ' ' + grunt.util.pluralize(failed, 'file/files') + ' failed validation');

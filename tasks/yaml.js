@@ -18,18 +18,15 @@ module.exports = function(grunt) {
 			if(grunt.file.isDir(filepath)) {
 				return;
 			}
-			grunt.log.debug('Validating "' + filepath + '"...');
-			var data = grunt.file.read(filepath);
-			options.filename = filepath;
+			grunt.log.subhead('Validating "' + filepath + '"...');
 			try {
-				linter.load(data, options);
+				linter.load(grunt.file.read(filepath), Object.assign(options, {"filename": filepath}));
 				grunt.verbose.ok(file + ' lint free.');
 				passed++;
 			} catch(e) {
 				failed++;
 				grunt.log.error(e);
 			}
-			delete options.filename;
 		});
 
 		if(failed > 0) {

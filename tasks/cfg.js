@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function(grunt) {
-	var linter = require('./lint/cfg.js');
+	var linter = require('./lint/cfg.js').init(grunt);
 
 	grunt.registerMultiTask('cfg', 'Linting CFG', function() {
 		var done = this.async();
@@ -17,10 +17,9 @@ module.exports = function(grunt) {
 			if(grunt.file.isDir(filepath)) {
 				return;
 			}
-			grunt.log.debug('Validating "' + filepath + '"...');
-			var data = grunt.file.read(filepath);
+			grunt.log.subhead('Validating "' + filepath + '"...');
 			try {
-				linter.parse(data, options);
+				linter.parse(grunt.file.read(filepath), options);
 				grunt.verbose.ok(filepath + ' lint free.');
 				passed++;
 			} catch(e) {
