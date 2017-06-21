@@ -11,13 +11,14 @@
 		}
 	],
 	"scripts": {
-		"test": "grunt test"
-	},
-	"dependencies": {
-		"jsonlint": "1.6.2",
-		"js-yaml": "3.8.1"
+		"test": "grunt test",
+		"testdev": "grunt testdev"
 	},
 	"devDependencies": {
-		"grunt": "~1.0.0"
+		"grunt": "~1.0.0",
+		"grunt-contrib-jshint": "~1.0.0",
+		"grunt-jscs": "3.0.1",
+		"jsonlint": "1.6.2",
+		"js-yaml": "3.8.1"
 	}
 }

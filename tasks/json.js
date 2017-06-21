@@ -1,6 +1,6 @@
-'use strict';
-
 module.exports = function(grunt) {
+	'use strict';
+
 	var linter = require('jsonlint');
 
 	grunt.registerMultiTask('json', 'Linting JSON', function() {
@@ -10,11 +10,11 @@ module.exports = function(grunt) {
 		});
 		var failed = 0;
 		var passed = 0;
-	    var force = options.force;
+		var force = options.force;
 		delete options.force;
 
 		// Hack into jsonlint's error handling
-		linter.parser.yy.parseError = function(str, hash) {
+		linter.parser.yy.parseError = function(str) {
 			grunt.log.error(str);
 		};
 
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 				passed++;
 			} catch(e) {
 				failed++;
-			};
+			}
 		});
 
 		if(failed > 0) {

@@ -1,6 +1,6 @@
-'use strict';
-
 module.exports = function(grunt) {
+	'use strict';
+
 	var linter = require('./lint/cfg.js').init(grunt);
 
 	grunt.registerMultiTask('cfg', 'Linting CFG', function() {
@@ -10,7 +10,7 @@ module.exports = function(grunt) {
 		});
 		var failed = 0;
 		var passed = 0;
-	    var force = options.force;
+		var force = options.force;
 		delete options.force;
 
 		this.filesSrc.forEach(function(filepath) {
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 				passed++;
 			} catch(e) {
 				failed++;
-			};
+			}
 		});
 
 		if(failed > 0) {

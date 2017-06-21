@@ -1,6 +1,6 @@
-'use strict';
-
 exports.init = function(grunt) {
+	'use strict';
+
 	var linter = {
 		didError: false,
 		lineNum: 0,
@@ -51,13 +51,13 @@ exports.init = function(grunt) {
 								continue;
 							case '"':
 								// Allow special characters as part of string lists
-								if(tmpList != null) {
+								if(tmpList !== null) {
 									break;
 								}
 								if(quoted) {
 									quoted = false;
 								}
-								if(!quoted && nameStart == -1) {
+								if(!quoted && nameStart === -1) {
 									quoted = true;
 								}
 								break;
@@ -76,7 +76,7 @@ exports.init = function(grunt) {
 									currentCat = name;
 									categories[qualifiedName] = currentCat;
 								} else {
-									currentCat = categories[qualifiedName]
+									currentCat = categories[qualifiedName];
 								}
 								name = null;
 								break;
@@ -183,6 +183,6 @@ exports.init = function(grunt) {
 				throw new Error();
 			}
 		}
-	}
+	};
 	return linter;
 };

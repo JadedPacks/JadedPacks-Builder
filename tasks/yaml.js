@@ -1,6 +1,6 @@
-'use strict';
-
 module.exports = function(grunt) {
+	'use strict';
+
 	var linter = require('js-yaml');
 
 	grunt.registerMultiTask('yaml', 'Linting YAML', function() {
@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 		});
 		var failed = 0;
 		var passed = 0;
-	    var force = options.force;
+		var force = options.force;
 		delete options.force;
 
 		this.filesSrc.forEach(function(filepath) {
@@ -20,8 +20,8 @@ module.exports = function(grunt) {
 			}
 			grunt.log.subhead('Validating "' + filepath + '"...');
 			try {
-				linter.load(grunt.file.read(filepath), Object.assign(options, {"filename": filepath}));
-				grunt.verbose.ok(file + ' lint free.');
+				linter.load(grunt.file.read(filepath), Object.assign(options, {'filename': filepath}));
+				grunt.verbose.ok(filepath + ' lint free.');
 				passed++;
 			} catch(e) {
 				failed++;
