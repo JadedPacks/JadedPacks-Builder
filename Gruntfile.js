@@ -35,13 +35,6 @@ module.exports = function(grunt) {
 		cfg: {
 			src: [
 				'**/*.cfg',
-				// Stupid mods that use custom config handling
-				'!**/CodeChickenCore.cfg',
-				'!**/CustomNpcs.cfg',
-				'!**/multipart.cfg',
-				'!**/NEI/**',
-				'!**/BiomeTweaker/**',
-				// Ignore Node
 				'!node_modules/**'
 			]
 		}

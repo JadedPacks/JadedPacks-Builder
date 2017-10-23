@@ -13,6 +13,11 @@ module.exports = function(grunt) {
 		var force = options.force;
 		delete options.force;
 
+		var skip = [];
+		if(grunt.file.exists('ignore.txt')) {
+			skip = grunt.file.read('ignore.txt').split("\n");
+		}
+
 		// Hack into jsonlint's error handling
 		linter.parser.yy.parseError = function(str) {
 			grunt.log.error(str);
@@ -23,12 +28,16 @@ module.exports = function(grunt) {
 				return;
 			}
 			grunt.log.subhead('Validating "' + filepath + '"...');
-			try {
-				linter.parse(grunt.file.read(filepath));
-				grunt.verbose.ok(filepath + ' lint free.');
-				passed++;
-			} catch(e) {
-				failed++;
+			if(grunt.file.isMatch(skip, filepath)) {
+				grunt.log.writeln('Skipped "' + filepath);
+			} else {
+				try {
+					linter.parse(grunt.file.read(filepath));
+					grunt.verbose.ok(filepath + ' lint free.');
+					passed++;
+				} catch(e) {
+					failed++;
+				}
 			}
 		});
 

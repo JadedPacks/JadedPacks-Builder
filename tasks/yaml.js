@@ -14,18 +14,27 @@ module.exports = function(grunt) {
 		var force = options.force;
 		delete options.force;
 
+		var skip = [];
+		if(grunt.file.exists('ignore.txt')) {
+			skip = grunt.file.read('ignore.txt').split("\n");
+		}
+
 		this.filesSrc.forEach(function(filepath) {
 			if(grunt.file.isDir(filepath)) {
 				return;
 			}
 			grunt.log.subhead('Validating "' + filepath + '"...');
-			try {
-				linter.load(grunt.file.read(filepath), Object.assign(options, {'filename': filepath}));
-				grunt.verbose.ok(filepath + ' lint free.');
-				passed++;
-			} catch(e) {
-				failed++;
-				grunt.log.error(e);
+			if(grunt.file.isMatch(skip, filepath)) {
+				grunt.log.writeln('Skipped "' + filepath);
+			} else {
+				try {
+					linter.load(grunt.file.read(filepath), Object.assign(options, {'filename': filepath}));
+					grunt.verbose.ok(filepath + ' lint free.');
+					passed++;
+				} catch(e) {
+					failed++;
+					grunt.log.error(e);
+				}
 			}
 		});
 
