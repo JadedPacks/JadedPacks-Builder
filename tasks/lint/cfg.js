@@ -103,24 +103,23 @@ exports.init = function(grunt) {
 								var prop = line.substring(i + 1);
 								switch(type) {
 									case 'B':
-										if(!(/^true|false$/i.test(prop))) {
+										if(!(/^\s?true|false(\s+)?$/i.test(prop))) {
 											this.error('Property is not a correct boolean.');
 										}
 										break;
 									case 'I':
-										if(!(/^[0-9-]+$/.test(prop))) {
+										if(!(/^\s?[0-9-]+(\s+)?$/.test(prop))) {
 											this.error('Property is not a correct integer.');
 										}
 										break;
 									case 'D':
-										if(!(/^[0-9-]+\.[0-9E-]+$/.test(prop))) {
+										if(!(/^\s?[0-9-]+(\.[0-9E-]+)?(\s+)?$/.test(prop))) {
 											this.error('Property is not a correct double.');
 										}
 										break;
 									case 'S':
-										if(!(/^[a-z]+$/i.test(prop))) {
-											this.error('Property is not a correct string.');
-										}
+									case null:
+										// Everything is a correct string, in Forge's view.
 										break;
 									default:
 										this.error('Unknown property type ' + type);
