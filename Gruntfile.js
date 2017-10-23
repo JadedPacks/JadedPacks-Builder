@@ -19,16 +19,12 @@ module.exports = function(grunt) {
 			src: '<%= jshint.all %>'
 		},
 		// And finally, test the modpack
-		// TODO: YAML parser required??
 		yaml: {
 			src: [
 				'**/*.yaml',
 				'!node_modules/**'
 			]
 		},
-		// TODO: Better JSON parser (detect all errors in a document, not just first)
-		// Possibly https://github.com/johngeorgewright/grunt-http/blob/master/tasks/http.js ?
-		// https://jsonformatter.curiousconcept.com/
 		json: {
 			src: [
 				'**/*.json',
