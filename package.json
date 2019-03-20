@@ -1,9 +1,9 @@
 {
-	"name": "jadedpacks",
+	"name": "jadedpacks-builder",
 	"homepage": "http://github.com/JadedPacks",
-	"license": "UNLICENSED",
+	"license": "GPL-2.0+",
 	"description": "Jaded Packs build testing",
-	"repository": "http://github.com/JadedPacks/gruntTests",
+	"repository": "http://github.com/JadedPacks/JadedPacks-Builder",
 	"authors": [
 		{
 			"name": "Developaws",
@@ -11,10 +11,12 @@
 		}
 	],
 	"scripts": {
+		"build": "grunt build",
 		"test": "grunt test",
 		"testdev": "grunt testdev"
 	},
 	"devDependencies": {
+		"archiver": "3.0.0",
 		"grunt": "~1.0.0",
 		"grunt-contrib-jshint": "~1.0.0",
 		"grunt-jscs": "3.0.1",

@@ -1,10 +1,34 @@
 'use strict';
 
 module.exports = function(grunt) {
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-jscs');
-	grunt.loadTasks('tasks');
 	grunt.initConfig({
+		// Build the modpack
+		buildZipClient: {
+			compress: {
+				archive: 'Client.zip'
+				files: [
+					{
+						src: [
+							'config/**'
+						],
+						dest: 'overrides/config/'
+					}, {
+						src: [
+							'mods/**'
+						],
+						dest: 'overrides/mods/'
+					},
+					{
+						src: [
+							'manifest.json'
+						]
+					}
+				]
+			}
+		},
+		buildZipServer: {
+			// TODO
+		},
 		// Test our own grunt tasks
 		jshint: {
 			options: {
@@ -39,6 +63,13 @@ module.exports = function(grunt) {
 			]
 		}
 	});
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-jscs');
+	grunt.loadTasks('tasks');
+	grunt.registerTask('build', [
+		'buildZipClient',
+		'buildZipServer'
+	]);
 	grunt.registerTask('test', [
 		'yaml',
 		'json',
@@ -48,6 +79,4 @@ module.exports = function(grunt) {
 		'jshint',
 		'jscs'
 	]);
-	grunt.option('force', true);
-	grunt.registerTask('default', 'test');
 };

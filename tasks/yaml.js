@@ -4,17 +4,16 @@ module.exports = function(grunt) {
 	var linter = require('js-yaml');
 
 	grunt.registerMultiTask('yaml', 'Linting YAML', function() {
-		var done = this.async();
-		var options = this.options({
-			force: false,
-			schema: linter.DEFAULT_SAFE_SCHEMA
-		});
-		var failed = 0;
-		var passed = 0;
-		var force = options.force;
-		delete options.force;
+		var done = this.async(),
+			options = this.options({
+				force: false,
+				schema: linter.DEFAULT_SAFE_SCHEMA
+			}),
+			failed = 0,
+			passed = 0,
+			force = options.force,
+			skip = [];
 
-		var skip = [];
 		if(grunt.file.exists('ignore.txt')) {
 			skip = grunt.file.read('ignore.txt').split("\n");
 		}

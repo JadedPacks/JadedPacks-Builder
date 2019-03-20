@@ -4,16 +4,15 @@ module.exports = function(grunt) {
 	var linter = require('jsonlint');
 
 	grunt.registerMultiTask('json', 'Linting JSON', function() {
-		var done = this.async();
-		var options = this.options({
-			force: false
-		});
-		var failed = 0;
-		var passed = 0;
-		var force = options.force;
-		delete options.force;
+		var done = this.async(),
+			options = this.options({
+				force: false
+			}),
+			failed = 0,
+			passed = 0,
+			force = options.force,
+			skip = [];
 
-		var skip = [];
 		if(grunt.file.exists('ignore.txt')) {
 			skip = grunt.file.read('ignore.txt').split("\n");
 		}
