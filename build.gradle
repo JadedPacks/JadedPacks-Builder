@@ -167,7 +167,6 @@ task validateCfgs() {
 											break;
 										default:
 											logger.error('Line ' + lineNum + ': Unknown property type ' + type);
-											throw new Exception();
 											hasFailed = true;
 									}
 									i = line.length();
@@ -232,14 +231,11 @@ task validateCfgs() {
 						tmpList.add(line.trim());
 					}
 				}
-			} finally {
-				// TEST
+			} catch(Exception e) {
+				logger.error('Corrupted CFG file? ' + getPath(file))
+				throw new Exception(e)
+				hasFailed = true;
 			}
-			//catch(Exception e) {
-			//	logger.error('Corrupted CFG file? ' + getPath(file))
-			//	throw new Exception(e)
-			//	hasFailed = true;
-			//}
 		}
 		if(hasFailed) {
 			throw new GradleException('There are CFG syntax errors')
