@@ -1,0 +1,252 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'org.yaml:snakeyaml:1.25'
+	}
+}
+import groovy.json.JsonSlurper
+import org.yaml.snakeyaml.Yaml
+
+if(!project.hasProperty('ignoredFiles')) {
+	def ignoredFiles = []
+} else {
+	ignoredFiles = project.getProperty('ignoredFiles').split(',')
+}
+
+def getPath(file) {
+	return file.getPath().replace(projectDir.getPath(), '')
+}
+
+task validateJsons() {
+	doLast {
+		def hasFailed = false
+		fileTree('config') {
+			include '**/*.json'
+			exclude ignoredFiles
+		}.each { file ->
+			logger.info('Processing JSON: ' + getPath(file))
+			try {
+				new JsonSlurper().parseText(file.text)
+			} catch(Exception e) {
+				logger.error('Invalid JSON: ' + getPath(file))
+				hasFailed = true
+			}
+		}
+		if(hasFailed) {
+			throw new GradleException('There are JSON syntax errors')
+		}
+	}
+}
+
+task validateYamls() {
+	doLast {
+		def yaml = new Yaml()
+		def hasFailed = false
+		fileTree('config') {
+			include '**/*.yaml', '**/*.yml'
+			exclude ignoredFiles
+		}.each { file ->
+			logger.info('Processing YAML: ' + getPath(file))
+			try {
+				yaml.load(file.text)
+			} catch(Exception e) {
+				logger.error('Invalid YAML: ' + getPath(file))
+				hasFailed = true
+			}
+		}
+		if(hasFailed) {
+			throw new GradleException('There are YAML syntax errors')
+		}
+	}
+}
+
+task validateCfgs() {
+	doLast {
+		def hasFailed = false
+		fileTree('config') {
+			include '**/*.conf', '**/*.cfg'
+			exclude ignoredFiles
+		}.each { file ->
+			logger.info('Processing CFG: ' + getPath(file))
+			try {
+				String currentCat = "", name = null;
+				char type = 0;
+				ArrayList<String> tmpList = null;
+				HashMap<String, String> categoriesParents = new HashMap<>();
+				HashMap<String, String> categories = new HashMap<>();
+				file.eachLine { line, lineNum ->
+					int nameStart = -1, nameEnd = -1;
+					boolean skip = false, quoted = false, isFirstNonWhitespaceCharOnLine = true;
+					for(int i = 0; i < line.length() && !skip; i++) {
+						char ch = line.charAt(i);
+						if(ch =~ /[a-zA-Z0-9._-]/ || (quoted && ch != '"')) {
+							if(nameStart == -1) {
+								nameStart = i;
+							}
+							nameEnd = i;
+							isFirstNonWhitespaceCharOnLine = false;
+						} else if(ch =~ /\s/) {
+							// Ignore space characters
+						} else {
+							switch(ch) {
+								case '#':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									skip = true;
+									continue;
+								case '"':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									if(quoted) {
+										quoted = false;
+									}
+									if(!quoted && nameStart == -1) {
+										quoted = true;
+									}
+									break;
+								case '{':
+									// Allow special chracters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									name = line.substring(nameStart, nameEnd + 1);
+									String qualifiedName = name;
+									if(!currentCat.equals("")) {
+										qualifiedName = currentCat + '.' + name;
+										categoriesParents.put(qualifiedName, currentCat);
+									}
+									if(!categories.containsKey(qualifiedName)) {
+										currentCat = name;
+										categories.put(qualifiedName, currentCat);
+									} else {
+										currentCat = categories.get(qualifiedName);
+									}
+									name = null;
+									break;
+								case '}':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									if(currentCat.equals("")) {
+										logger.error('Line ' + lineNum + ': Config file corrupt, attempted to close too many categories.');
+										hasFailed = true;
+									}
+									currentCat = categoriesParents.get(currentCat);
+									break;
+								case '=':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									name = line.substring(nameStart, nameEnd + 1);
+									if(currentCat.equals("")) {
+										logger.error('Line ' + lineNum + ': ' + name + ' has no scope.');
+										hasFailed = true;
+									}
+									String prop = line.substring(i + 1);
+									switch(type) {
+										case 'B':
+											// Check for boolean type
+											break;
+										case 'I':
+											// Check for integer type
+											break;
+										case 'D':
+											// Check for double type
+											break;
+										case 'S':
+										case null:
+											// Everything is a correct string, in Forge's view.
+											break;
+										default:
+											logger.error('Line ' + lineNum + ': Unknown property type ' + type);
+											throw new Exception();
+											hasFailed = true;
+									}
+									i = line.length();
+									break;
+								case ':':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									type = line.substring(nameStart, nameEnd + 1).charAt(0);
+									nameStart = nameEnd = -1;
+									break;
+								case '<':
+									if((tmpList != null && i +1 == line.length()) || (tmpList == null && i + 1 != line.length())) {
+										logger.error('Line ' + lineNum + ': Malformed list property');
+										hasFailed = true;
+									} else if(i + 1 == line.length()) {
+										name = line.substring(nameStart, nameEnd + 1);
+										if(currentCat.equals("")) {
+											logger.error('Line ' + lineNum + ': ' + name + ' has no scope.');
+											hasFailed = true;
+										}
+										tmpList = new ArrayList<String>();
+										skip = true;
+									}
+									break;
+								case '>':
+									if(tmpList == null) {
+										logger.error('Line ' + lineNum + ': Malformed list property');
+										hasFailed = true;
+									}
+									if(isFirstNonWhitespaceCharOnLine) {
+										name = tmpList = type = null;
+									}
+									// Else allow special characters as part of string lists
+									break;
+								case '~':
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									// Do we even need to parse versions?
+									if(line.startsWith('~CONFIG_VERSION')) {
+										skip = true;
+									}
+									break;
+								default:
+									// Allow special characters as part of string lists
+									if(tmpList != null) {
+										break;
+									}
+									logger.error('Line ' + lineNum + ': Unknown character "' + ch + '"');
+									hasFailed = true;
+							}
+							isFirstNonWhitespaceCharOnLine = false;
+						}
+					}
+					if(quoted) {
+						logger.error('Line ' + lineNum + ': Unmatched quote');
+						hasFailed = true;
+					} else if(tmpList != null && !skip) {
+						tmpList.add(line.trim());
+					}
+				}
+			} finally {
+				// TEST
+			}
+			//catch(Exception e) {
+			//	logger.error('Corrupted CFG file? ' + getPath(file))
+			//	throw new Exception(e)
+			//	hasFailed = true;
+			//}
+		}
+		if(hasFailed) {
+			throw new GradleException('There are CFG syntax errors')
+		}
+	}
+}
+
+task build {
+	dependsOn 'validateJsons', 'validateYamls', 'validateCfgs'
+}
